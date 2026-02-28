@@ -18,7 +18,7 @@ const HomePage = () => {
     (a) => a.date && a.date < today && a.status !== 'feito'
   );
   const completed = activities.filter(
-    (a) => a.status === 'feito' && a.date && a.date >= ago7days && a.date <= today
+    (a) => a.status === 'feito' && (!a.date || (a.date >= ago7days && a.date <= today))
   );
 
   const getSubjectName = (id: string) => subjects.find((s) => s.id === id)?.name || 'Sem matéria';
@@ -58,7 +58,7 @@ const HomePage = () => {
                       style={{ backgroundColor: ACTIVITY_TYPE_COLORS[a.type] }}
                     />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-body font-semibold truncate">{a.title}</p>
+                      <p className="text-sm font-body truncate">{a.title}</p>
                       <p className="text-xs text-muted-foreground font-body">
                         {getSubjectName(a.subjectId)} · {a.date}
                       </p>
@@ -100,7 +100,7 @@ const HomePage = () => {
                       style={{ backgroundColor: ACTIVITY_TYPE_COLORS[a.type] }}
                     />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-body font-semibold truncate">{a.title}</p>
+                      <p className="text-sm font-body truncate">{a.title}</p>
                       <p className="text-xs text-muted-foreground font-body">
                         {getSubjectName(a.subjectId)} · {a.date}
                       </p>
@@ -133,7 +133,7 @@ const HomePage = () => {
                   >
                     <div className="w-3 h-3 rounded-full flex-shrink-0 bg-bloom-green" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-body font-semibold truncate line-through opacity-70">{a.title}</p>
+                      <p className="text-sm font-body truncate line-through opacity-70">{a.title}</p>
                       <p className="text-xs text-muted-foreground font-body">
                         {getSubjectName(a.subjectId)}
                       </p>
