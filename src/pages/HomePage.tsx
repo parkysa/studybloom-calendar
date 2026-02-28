@@ -36,7 +36,7 @@ const HomePage = () => {
           {/* Próximas Atividades */}
           <Card className="rounded-2xl border-border shadow-md hover:shadow-lg transition-shadow overflow-hidden">
             <CardHeader className="bg-gradient-to-r from-bloom-blue/20 to-bloom-purple/20 pb-3">
-              <CardTitle className="flex items-center gap-2 text-lg font-display text-foreground">
+              <CardTitle className="flex items-center gap-2 text-lg font-display text-foreground font-normal">
                 <CalendarClock className="text-bloom-blue" size={22} />
                 Próximas Atividades
               </CardTitle>
@@ -78,7 +78,7 @@ const HomePage = () => {
           {/* Atenção Atraso */}
           <Card className="rounded-2xl border-border shadow-md hover:shadow-lg transition-shadow overflow-hidden">
             <CardHeader className="bg-gradient-to-r from-bloom-red/20 to-bloom-orange/20 pb-3">
-              <CardTitle className="flex items-center gap-2 text-lg font-display text-foreground">
+              <CardTitle className="flex items-center gap-2 text-lg font-display text-foreground font-normal">
                 <AlertTriangle className="text-bloom-red" size={22} />
                 Atenção: Atraso!
               </CardTitle>
@@ -114,7 +114,7 @@ const HomePage = () => {
           {/* Você Arrasou */}
           <Card className="rounded-2xl border-border shadow-md hover:shadow-lg transition-shadow overflow-hidden">
             <CardHeader className="bg-gradient-to-r from-bloom-green/20 to-bloom-yellow/20 pb-3">
-              <CardTitle className="flex items-center gap-2 text-lg font-display text-foreground">
+              <CardTitle className="flex items-center gap-2 text-lg font-display text-foreground font-normal">
                 <PartyPopper className="text-bloom-green" size={22} />
                 Você Arrasou!
               </CardTitle>
