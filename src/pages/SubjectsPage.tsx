@@ -119,7 +119,7 @@ const SubjectsPage = () => {
               <div className="h-2" style={{ backgroundColor: subject.color }} />
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center justify-between">
-                  <span className="font-display text-lg text-foreground">{subject.name}</span>
+                  <span className="font-display text-lg text-foreground font-normal">{subject.name}</span>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
