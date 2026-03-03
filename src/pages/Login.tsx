@@ -4,29 +4,42 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import CatMascot from '@/components/CatMascot';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+import { useToast } from '@/hooks/use-toast';
 
 const Login = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/home');
+    setLoading(true);
+    
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro no login",
+        description: error.message,
+      });
+    } else {
+      navigate('/home');
+    }
+    setLoading(false);
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-bloom-pink-light via-background to-accent p-4">
-      {/* Decorative flowers */}
-      <div className="fixed top-10 left-10 text-4xl animate-float">🌸</div>
-      <div className="fixed top-20 right-20 text-3xl animate-float" style={{ animationDelay: '0.5s' }}>🌷</div>
-      <div className="fixed bottom-20 left-20 text-3xl animate-float" style={{ animationDelay: '1s' }}>🌺</div>
-      <div className="fixed bottom-10 right-10 text-4xl animate-float" style={{ animationDelay: '1.5s' }}>✿</div>
-
       <div className="w-full max-w-md">
         <div className="bg-card rounded-3xl shadow-2xl p-8 border border-border relative overflow-hidden">
-          {/* Top decorative wave */}
           <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-bloom-pink via-bloom-purple to-bloom-pink" />
           
           <div className="flex flex-col items-center mb-8">
@@ -45,7 +58,8 @@ const Login = () => {
                   placeholder="seu@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10 rounded-xl border-border bg-secondary/50 focus:ring-primary h-12 font-body"
+                  className="pl-10 rounded-xl h-12"
+                  required
                 />
               </div>
             </div>
@@ -59,32 +73,30 @@ const Login = () => {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 pr-10 rounded-xl border-border bg-secondary/50 focus:ring-primary h-12 font-body"
+                  className="pl-10 pr-10 rounded-xl h-12"
+                  required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
             </div>
 
-            <div className="text-right">
-              <a href="#" className="text-xs text-primary hover:underline font-body">Esqueceu a senha?</a>
-            </div>
-
             <Button
               type="submit"
-              className="w-full h-12 rounded-xl font-body font-bold text-base bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-300"
+              disabled={loading}
+              className="w-full h-12 rounded-xl font-bold bg-primary hover:bg-primary/90"
             >
-              🌸 Entrar
+              {loading ? "Carregando..." : "🌸 Entrar"}
             </Button>
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-muted-foreground font-body">
+            <p className="text-sm text-muted-foreground">
               Não tem uma conta?{' '}
               <Link to="/cadastro" className="text-primary font-semibold hover:underline">
                 Criar conta
