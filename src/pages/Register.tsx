@@ -4,18 +4,66 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import CatMascot from '@/components/CatMascot';
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+import { useToast } from '@/hooks/use-toast';
 
 const Register = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/home');
+    
+    if (password !== confirmPassword) {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "As senhas não coincidem",
+      });
+      return;
+    }
+
+    if (password.length < 6) {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "A senha deve ter pelo menos 6 caracteres",
+      });
+      return;
+    }
+
+    setLoading(true);
+    
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          name,
+        },
+      },
+    });
+
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro no cadastro",
+        description: error.message,
+      });
+    } else {
+      toast({
+        title: "Conta criada! 🌸",
+        description: "Verifique seu email para confirmar o cadastro.",
+      });
+      navigate('/');
+    }
+    setLoading(false);
   };
 
   return (
@@ -46,6 +94,7 @@ const Register = () => {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="pl-10 rounded-xl border-border bg-secondary/50 h-12 font-body"
+                  required
                 />
               </div>
             </div>
@@ -60,6 +109,7 @@ const Register = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10 rounded-xl border-border bg-secondary/50 h-12 font-body"
+                  required
                 />
               </div>
             </div>
@@ -74,6 +124,7 @@ const Register = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="pl-10 pr-10 rounded-xl border-border bg-secondary/50 h-12 font-body"
+                  required
                 />
                 <button
                   type="button"
@@ -95,15 +146,17 @@ const Register = () => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className="pl-10 rounded-xl border-border bg-secondary/50 h-12 font-body"
+                  required
                 />
               </div>
             </div>
 
             <Button
               type="submit"
+              disabled={loading}
               className="w-full h-12 rounded-xl font-body font-bold text-base bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-300"
             >
-              🌸 Criar Conta
+              {loading ? "Criando..." : "🌸 Criar Conta"}
             </Button>
           </form>
 
