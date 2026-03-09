@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AppLayout from '@/components/AppLayout';
 import { useStore } from '@/store/useStore';
 import { supabase } from '@/lib/supabase';
+import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -17,6 +18,7 @@ import { Subject, Grade, Absence, SubjectNote } from '@/types/studybloom';
 
 const SubjectsPage = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const {
     subjects, addSubject, removeSubject,
     addGrade, removeGrade,
@@ -56,7 +58,8 @@ const SubjectsPage = () => {
 
   const handleAddSubject = async () => {
     if (!newName) return;
-    await addSubject({
+
+    const error = await addSubject({
       name: newName,
       color: newColor,
       professor: newProfessor,
@@ -65,6 +68,16 @@ const SubjectsPage = () => {
       absences: [],
       notes: [],
     });
+
+    if (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Não foi possível adicionar a matéria',
+        description: error,
+      });
+      return;
+    }
+
     setNewName('');
     setNewColor('#E8A0BF');
     setNewProfessor('');
