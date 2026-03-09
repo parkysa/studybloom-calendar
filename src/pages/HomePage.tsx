@@ -1,11 +1,28 @@
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AppLayout from '@/components/AppLayout';
 import { useStore } from '@/store/useStore';
+import { supabase } from '@/lib/supabase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CalendarClock, AlertTriangle, PartyPopper } from 'lucide-react';
 import { ACTIVITY_TYPE_LABELS, ACTIVITY_TYPE_COLORS } from '@/types/studybloom';
 
 const HomePage = () => {
-  const { activities, subjects } = useStore();
+  const navigate = useNavigate();
+  const { activities, subjects, fetchInitialData } = useStore();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate('/');
+        return;
+      }
+      fetchInitialData();
+    };
+    checkAuth();
+  }, [navigate, fetchInitialData]);
+
   const now = new Date();
   const today = now.toISOString().split('T')[0];
   const in7days = new Date(now.getTime() + 7 * 86400000).toISOString().split('T')[0];
