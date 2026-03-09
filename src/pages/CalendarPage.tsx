@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import AppLayout from '@/components/AppLayout';
 import { useStore } from '@/store/useStore';
 import { supabase } from '@/lib/supabase';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ACTIVITY_TYPE_COLORS } from '@/types/studybloom';
-
+import { ACTIVITY_TYPE_COLORS, ACTIVITY_TYPE_LABELS } from '@/types/studybloom';
+import { useToast } from '@/hooks/use-toast';
 interface Holiday {
   date: string;
   name: string;
@@ -24,7 +24,62 @@ const CalendarPage = () => {
   const { activities, subjects, fetchInitialData } = useStore();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [holidays, setHolidays] = useState<Holiday[]>([]);
+  const { toast } = useToast();
 
+  const exportToICS = () => {
+    const activitiesWithDate = activities.filter(a => a.date);
+    
+    if (activitiesWithDate.length === 0) {
+      toast({
+        title: "Nenhuma atividade para exportar",
+        description: "Adicione atividades com data para exportar.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    let icsContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//StudyBloom//Calendar//PT',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+    ];
+
+    activitiesWithDate.forEach(activity => {
+      const subject = subjects.find(s => s.id === activity.subjectId);
+      const dateStr = activity.date!.replace(/-/g, '');
+      const typeLabel = ACTIVITY_TYPE_LABELS[activity.type];
+      
+      icsContent.push(
+        'BEGIN:VEVENT',
+        `UID:${activity.id}@studybloom`,
+        `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
+        `DTSTART;VALUE=DATE:${dateStr}`,
+        `DTEND;VALUE=DATE:${dateStr}`,
+        `SUMMARY:${typeLabel}: ${activity.title}`,
+        `DESCRIPTION:Matéria: ${subject?.name || 'Sem matéria'}`,
+        'END:VEVENT'
+      );
+    });
+
+    icsContent.push('END:VCALENDAR');
+
+    const blob = new Blob([icsContent.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'studybloom-calendario.ics';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "Arquivo exportado! 📅",
+      description: "Importe o arquivo .ics no Google Calendar para ver suas atividades.",
+    });
+  };
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -131,6 +186,10 @@ const CalendarPage = () => {
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-display text-primary">Calendário 📅</h1>
+          <Button onClick={exportToICS} variant="outline" className="gap-2">
+            <Download size={16} />
+            Exportar para Google Calendar
+          </Button>
         </div>
 
         {/* Legend */}
