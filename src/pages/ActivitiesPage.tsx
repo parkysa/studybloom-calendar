@@ -39,17 +39,15 @@ const ActivitiesPage = () => {
     checkAuth();
   }, [navigate, fetchInitialData]);
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (!newTitle || !newSubjectId) return;
-    const activity: Activity = {
-      id: Date.now().toString(),
+    await addActivity({
       title: newTitle,
       date: newDate || undefined,
       type: newType,
       status: 'a_fazer',
       subjectId: newSubjectId,
-    };
-    addActivity(activity);
+    });
     setNewTitle('');
     setNewDate('');
     setNewType('trabalho');
