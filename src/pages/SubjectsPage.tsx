@@ -38,10 +38,9 @@ const SubjectsPage = () => {
   // Note form
   const [noteContent, setNoteContent] = useState('');
 
-  const handleAddSubject = () => {
+  const handleAddSubject = async () => {
     if (!newName) return;
-    const subject: Subject = {
-      id: Date.now().toString(),
+    await addSubject({
       name: newName,
       color: newColor,
       professor: newProfessor,
@@ -49,8 +48,7 @@ const SubjectsPage = () => {
       grades: [],
       absences: [],
       notes: [],
-    };
-    addSubject(subject);
+    });
     setNewName('');
     setNewColor('#E8A0BF');
     setNewProfessor('');
