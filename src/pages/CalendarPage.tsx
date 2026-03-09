@@ -186,6 +186,10 @@ const CalendarPage = () => {
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-display text-primary">Calendário 📅</h1>
+          <Button onClick={exportToICS} variant="outline" className="gap-2">
+            <Download size={16} />
+            Exportar para Google Calendar
+          </Button>
         </div>
 
         {/* Legend */}
