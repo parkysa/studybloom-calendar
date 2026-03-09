@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import AppLayout from '@/components/AppLayout';
 import { useStore } from '@/store/useStore';
 import { supabase } from '@/lib/supabase';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ACTIVITY_TYPE_COLORS } from '@/types/studybloom';
-
+import { ACTIVITY_TYPE_COLORS, ACTIVITY_TYPE_LABELS } from '@/types/studybloom';
+import { useToast } from '@/hooks/use-toast';
 interface Holiday {
   date: string;
   name: string;
