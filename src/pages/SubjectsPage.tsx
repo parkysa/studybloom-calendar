@@ -30,6 +30,7 @@ const SubjectsPage = () => {
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
+      console.log('[SubjectsPage] auth user:', user?.id);
       if (!user) {
         navigate('/');
         return;
@@ -57,7 +58,21 @@ const SubjectsPage = () => {
   const [noteContent, setNoteContent] = useState('');
 
   const handleAddSubject = async () => {
-    if (!newName) return;
+    console.log('[SubjectsPage] handleAddSubject click', {
+      newName,
+      newColor,
+      newProfessor,
+      newProfEmail,
+    });
+
+    if (!newName) {
+      toast({
+        variant: 'destructive',
+        title: 'Nome obrigatório',
+        description: 'Preencha o nome da matéria para continuar.',
+      });
+      return;
+    }
 
     const error = await addSubject({
       name: newName,
@@ -68,6 +83,8 @@ const SubjectsPage = () => {
       absences: [],
       notes: [],
     });
+
+    console.log('[SubjectsPage] addSubject result:', { error });
 
     if (error) {
       toast({

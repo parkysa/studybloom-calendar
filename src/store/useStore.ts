@@ -29,6 +29,7 @@ export const useStore = create<StoreState>((set, get) => ({
   fetchInitialData: async () => {
     set({ isLoading: true });
     const { data: { user } } = await supabase.auth.getUser();
+    console.log('[useStore] fetchInitialData user:', user?.id);
     if (!user) {
       set({ isLoading: false });
       return;
@@ -51,12 +52,15 @@ export const useStore = create<StoreState>((set, get) => ({
 
   addSubject: async (subject) => {
     const { data: { user } } = await supabase.auth.getUser();
+    console.log('[useStore] addSubject user:', user?.id, 'payload:', subject);
     if (!user) return 'Você precisa estar logado para adicionar uma matéria.';
 
     const { data, error } = await supabase
       .from('subjects')
       .insert([{ ...subject, user_id: user.id }])
       .select();
+
+    console.log('[useStore] addSubject response:', { data, error });
 
     if (error) {
       console.error('[useStore] addSubject error:', error);
