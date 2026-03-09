@@ -16,12 +16,26 @@ import {
 import { Subject, Grade, Absence, SubjectNote } from '@/types/studybloom';
 
 const SubjectsPage = () => {
+  const navigate = useNavigate();
   const {
     subjects, addSubject, removeSubject,
     addGrade, removeGrade,
     addAbsence, removeAbsence,
     addSubjectNote, removeSubjectNote,
+    fetchInitialData, isLoading,
   } = useStore();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate('/');
+        return;
+      }
+      fetchInitialData();
+    };
+    checkAuth();
+  }, [navigate, fetchInitialData]);
 
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [detailSubject, setDetailSubject] = useState<Subject | null>(null);
