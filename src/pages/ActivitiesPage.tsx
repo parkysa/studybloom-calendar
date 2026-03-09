@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AppLayout from '@/components/AppLayout';
 import { useStore } from '@/store/useStore';
 import { supabase } from '@/lib/supabase';
+import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -20,6 +21,7 @@ import {
 
 const ActivitiesPage = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { activities, subjects, addActivity, removeActivity, updateActivity, fetchInitialData } = useStore();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newTitle, setNewTitle] = useState('');
@@ -41,13 +43,24 @@ const ActivitiesPage = () => {
 
   const handleAdd = async () => {
     if (!newTitle || !newSubjectId) return;
-    await addActivity({
+
+    const error = await addActivity({
       title: newTitle,
       date: newDate || undefined,
       type: newType,
       status: 'a_fazer',
       subjectId: newSubjectId,
     });
+
+    if (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Não foi possível adicionar a atividade',
+        description: error,
+      });
+      return;
+    }
+
     setNewTitle('');
     setNewDate('');
     setNewType('trabalho');
