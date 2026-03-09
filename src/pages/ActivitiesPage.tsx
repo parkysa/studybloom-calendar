@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AppLayout from '@/components/AppLayout';
 import { useStore } from '@/store/useStore';
+import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -17,24 +19,35 @@ import {
 } from '@/types/studybloom';
 
 const ActivitiesPage = () => {
-  const { activities, subjects, addActivity, removeActivity, updateActivity } = useStore();
+  const navigate = useNavigate();
+  const { activities, subjects, addActivity, removeActivity, updateActivity, fetchInitialData } = useStore();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newDate, setNewDate] = useState('');
   const [newType, setNewType] = useState<ActivityType>('trabalho');
   const [newSubjectId, setNewSubjectId] = useState('');
 
-  const handleAdd = () => {
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate('/');
+        return;
+      }
+      fetchInitialData();
+    };
+    checkAuth();
+  }, [navigate, fetchInitialData]);
+
+  const handleAdd = async () => {
     if (!newTitle || !newSubjectId) return;
-    const activity: Activity = {
-      id: Date.now().toString(),
+    await addActivity({
       title: newTitle,
       date: newDate || undefined,
       type: newType,
       status: 'a_fazer',
       subjectId: newSubjectId,
-    };
-    addActivity(activity);
+    });
     setNewTitle('');
     setNewDate('');
     setNewType('trabalho');

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AppLayout from '@/components/AppLayout';
 import { useStore } from '@/store/useStore';
+import { supabase } from '@/lib/supabase';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ACTIVITY_TYPE_COLORS } from '@/types/studybloom';
@@ -18,9 +20,22 @@ const MONTHS = [
 ];
 
 const CalendarPage = () => {
-  const { activities, subjects } = useStore();
+  const navigate = useNavigate();
+  const { activities, subjects, fetchInitialData } = useStore();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [holidays, setHolidays] = useState<Holiday[]>([]);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate('/');
+        return;
+      }
+      fetchInitialData();
+    };
+    checkAuth();
+  }, [navigate, fetchInitialData]);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();

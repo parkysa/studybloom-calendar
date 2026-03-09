@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AppLayout from '@/components/AppLayout';
 import { useStore } from '@/store/useStore';
+import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -14,12 +16,26 @@ import {
 import { Subject, Grade, Absence, SubjectNote } from '@/types/studybloom';
 
 const SubjectsPage = () => {
+  const navigate = useNavigate();
   const {
     subjects, addSubject, removeSubject,
     addGrade, removeGrade,
     addAbsence, removeAbsence,
     addSubjectNote, removeSubjectNote,
+    fetchInitialData, isLoading,
   } = useStore();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate('/');
+        return;
+      }
+      fetchInitialData();
+    };
+    checkAuth();
+  }, [navigate, fetchInitialData]);
 
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [detailSubject, setDetailSubject] = useState<Subject | null>(null);
@@ -38,10 +54,9 @@ const SubjectsPage = () => {
   // Note form
   const [noteContent, setNoteContent] = useState('');
 
-  const handleAddSubject = () => {
+  const handleAddSubject = async () => {
     if (!newName) return;
-    const subject: Subject = {
-      id: Date.now().toString(),
+    await addSubject({
       name: newName,
       color: newColor,
       professor: newProfessor,
@@ -49,8 +64,7 @@ const SubjectsPage = () => {
       grades: [],
       absences: [],
       notes: [],
-    };
-    addSubject(subject);
+    });
     setNewName('');
     setNewColor('#E8A0BF');
     setNewProfessor('');
